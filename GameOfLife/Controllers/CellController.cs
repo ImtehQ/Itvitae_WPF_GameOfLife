@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using GameOfLife.Models;
+using GameOfLife.Rules;
 
 namespace GameOfLife.Controllers
 {
@@ -13,7 +14,10 @@ namespace GameOfLife.Controllers
 
         //Saves us some count calls.
         private int neighborsAliveCount = 0;
-       
+
+        private Rule rule = new Default();
+
+
         private void CheckCoruption()
         {
             if (cell.neighbors.Count < 8) //8 is the magic number
@@ -32,7 +36,7 @@ namespace GameOfLife.Controllers
         /// Check the current state of the cell and updates the cell
         /// </summary>
         /// <param name="autoUpdate"></param>
-        public void UpdateAlive(bool autoUpdate = true)
+        public void UpdateAlive(bool autoUpdate)
         {
             CheckCoruption();
 
@@ -42,18 +46,10 @@ namespace GameOfLife.Controllers
             //Will be called lots of time, so its a global variable
             neighborsAliveCount = cell.neighbors.Count(n => n.aliveLastFrame == true);
 
-            if (neighborsAliveCount <= 1 && cell.aliveLastFrame)
-                cell.aliveCurrentFrame = false; //dies
-            else if (neighborsAliveCount >= 4 && cell.aliveLastFrame)
-                cell.aliveCurrentFrame = false; //dies
-            else if (neighborsAliveCount == 3 && cell.aliveLastFrame ==false)
-                cell.aliveCurrentFrame = true; //Born
-            else if (neighborsAliveCount >= 2 && cell.aliveLastFrame)
-                cell.aliveCurrentFrame = true; // stays alive
-            else if (neighborsAliveCount >= 2 && cell.aliveLastFrame == false)
-                cell.aliveCurrentFrame = false; // stays dead
-            //else
-            //    cell.Corrupt = true;
+            //Before we set the cells new state, we save its last state
+            cell.aliveLastFrame = cell.aliveCurrentFrame;
+            //Its not needed for the game, but does add a ton of extra options.
+            cell.aliveCurrentFrame = rule.NewState(cell.aliveLastFrame, neighborsAliveCount);
 
             if (autoUpdate)
                 UpdateStatus();
@@ -85,22 +81,24 @@ namespace GameOfLife.Controllers
             {
                 //It was was not changed
             }
-
-            cell.aliveLastFrame = cell.aliveCurrentFrame;
         }
 
         /// <summary>
         /// Only used to overwrite cell status
         /// </summary>
         /// <param name="value"></param>
-        public void SetAlive(bool value, bool includeLastFrame)
+        public void SetAlive(bool value, bool includeLastFrame, bool toggle = false)
         {
-            cell.aliveCurrentFrame = value;
+            if (toggle)
+                cell.aliveCurrentFrame = !cell.aliveCurrentFrame;
+            else
+                cell.aliveCurrentFrame = value;
+
             if (includeLastFrame)
-                cell.aliveLastFrame = value;
+                cell.aliveLastFrame = cell.aliveCurrentFrame;
         }
 
-        public bool GetAlive()
+        public bool GetAliveCurrentFrame()
         {
             return cell.aliveCurrentFrame;
         }

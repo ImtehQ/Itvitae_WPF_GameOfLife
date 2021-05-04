@@ -26,6 +26,7 @@
             <Label x:Name="mapSizeLabel" Content="100"/>
             <Button x:Name="generateMapBtn" Content="Generate new map" Click="generateMapBtn_Click"/>
             <Button x:Name="spawnRandomBtn" Content="Spawn random" Click="spawnRandomBtn_Click" IsEnabled="False"/>
+            <CheckBox x:Name="enableGhostingCheckbox" Content="Ghosting" Click="enableGhostingCheckbox_Click"/>
         </StatusBar>
 
     </Grid>

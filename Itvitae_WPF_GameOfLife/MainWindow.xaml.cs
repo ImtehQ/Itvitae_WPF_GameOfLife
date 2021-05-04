@@ -19,6 +19,7 @@ namespace Itvitae_WPF_GameOfLife
         int mapSize = 0;
         int milisecondsGameSpeed = 0;
         bool GameIsRunning = false;
+        bool enableGhosting = false;
 
         System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
 
@@ -31,18 +32,19 @@ namespace Itvitae_WPF_GameOfLife
 
         private void Window_Activated(object sender, System.EventArgs e)
         {
-            mapSize = (int)mapSizeSlider.Value;
-
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, milisecondsGameSpeed);
+
+            SpeedLabel.Content = milisecondsGameSpeed;
+            mapSizeLabel.Content = mapSize;
         }
 
 
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            map.CheckWorldMap(); //Check each cell in the world
-            map.UpdateWorldMap(); //Update its status
+            map.CheckWorldMap(true); //Check each cell in the world
+            //map.UpdateWorldMap(); //Update its status
             map.UpdateBitMapData(); //Generate a Bitmap to display
 
             MapImage.Source = map.GetBitMapData().Convert(mapSize, 500); //Convert the Bitmap to a type the WPF image thingy can understand.
@@ -108,26 +110,31 @@ namespace Itvitae_WPF_GameOfLife
         {
             mouseLocation = e.GetPosition(null);
 
-            map.ChangeCellAliveStatus(new Point2(mouseLocation.X, mouseLocation.Y), 500, 500, true);
+            if (GameIsRunning == false)
+            {
+                map.ChangeCellAliveStatus(new Point2(mouseLocation.X, mouseLocation.Y), 500, 500, true, true);
 
-            map.UpdateBitMapData();
-            MapImage.Source = map.GetBitMapData().Convert(mapSize, 500);
+                map.UpdateBitMapData();
+                MapImage.Source = map.GetBitMapData().Convert(mapSize, 500);
+            }
         }
 
         private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             milisecondsGameSpeed = (int)SpeedSlider.Value;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, milisecondsGameSpeed);
-            SpeedLabel.Content = milisecondsGameSpeed;
+
+            if(SpeedLabel != null) //Gets invoked before label is loaded
+                SpeedLabel.Content = milisecondsGameSpeed;
         }
 
         private void mapSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            mapSize = (int)mapSizeSlider.Value;
+
             if (mapSizeLabel != null) //Gets invoked before label is loaded
-            {
-                mapSize = (int)mapSizeSlider.Value;
                 mapSizeLabel.Content = mapSize;
-            }
+
         }
 
         private void generateMapBtn_Click(object sender, RoutedEventArgs e)
@@ -148,14 +155,22 @@ namespace Itvitae_WPF_GameOfLife
             LoadBtn.IsEnabled = true;
             SpeedSlider.IsEnabled = true;
             spawnRandomBtn.IsEnabled = true;
+
+            map.enableGhosting = enableGhosting;
         }
 
         private void spawnRandomBtn_Click(object sender, RoutedEventArgs e)
         {
-            map.RandomAlive();
+            map.RandomAlive(20, new Random().Next(5,200));
             map.UpdateBitMapData();
 
             MapImage.Source = map.GetBitMapData().Convert(mapSize, 500);
+        }
+
+        private void enableGhostingCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            enableGhosting = (bool)enableGhostingCheckbox.IsChecked;
+            map.enableGhosting = enableGhosting; //I know, but we need it in map generation to
         }
     }
 }

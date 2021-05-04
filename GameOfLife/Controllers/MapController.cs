@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Drawing;
 using GameOfLife.Extentions;
+using GameOfLife.Templates;
 
 namespace GameOfLife.Controllers
 {
     public class MapController
     {
-
         private Random randomFill;
         private int cellWidth = 100;
         public CellController[,] CellControllers;
@@ -14,7 +14,9 @@ namespace GameOfLife.Controllers
         private Bitmap mapData;
         private Graphics mapDataGraphics;
 
+        private Template template = new Default();
 
+        public bool enableGhosting = false;
 
         public Bitmap GenerateBitMapData()
         {
@@ -30,15 +32,10 @@ namespace GameOfLife.Controllers
             {
                 for (int x = 0; x < cellWidth; x++)
                 {
-                    if (CellControllers[x, y].GetCorrupt() == true)
-                    {
-                        mapDataGraphics.FillRectangle(Brushes.Red, x, y, 1, 1);
-                        continue;
-                    }
-                    if (CellControllers[x, y].GetAlive() == true)
-                        mapDataGraphics.FillRectangle(Brushes.White, x, y, 1, 1);
-                    else
-                        mapDataGraphics.FillRectangle(Brushes.Black, x, y, 1, 1);
+                    mapDataGraphics.FillRectangle(template.GetColor(
+                        CellControllers[x, y].GetAliveLastFrame(), 
+                        CellControllers[x, y].GetAliveCurrentFrame(),
+                        CellControllers[x, y].GetCorrupt(), enableGhosting), x, y, 1, 1);
                 }
             }
         }
@@ -55,11 +52,12 @@ namespace GameOfLife.Controllers
         /// <param name="screenWidth"></param>
         /// <param name="screenHeight"></param>
         /// <param name="newState"></param>
-        public void ChangeCellAliveStatus(Point2 PointOnScreen, int screenWidth, int screenHeight, bool newState)
+        public void ChangeCellAliveStatus(Point2 PointOnScreen, int screenWidth, int screenHeight, bool newState, bool toggle = false)
         {
             Point2 arrayPoint = GetArrayLocation(PointOnScreen, screenWidth, screenHeight);
 
-            CellControllers[arrayPoint.X, arrayPoint.Y].SetAlive(newState, true);
+            
+            CellControllers[arrayPoint.X, arrayPoint.Y].SetAlive(newState, true, toggle);
 
         }
 
@@ -122,13 +120,13 @@ namespace GameOfLife.Controllers
         /// <summary>
         /// Check each cell if death or alive
         /// </summary>
-        public void CheckWorldMap()
+        public void CheckWorldMap(bool autoUpdate)
         {
             for (int y = 0; y < cellWidth; y++)
             {
                 for (int x = 0; x < cellWidth; x++)
                 {
-                    CellControllers[x, y].UpdateAlive();
+                    CellControllers[x, y].UpdateAlive(autoUpdate);
                 }
             }
         }

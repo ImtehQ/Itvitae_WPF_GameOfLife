@@ -6,6 +6,13 @@ namespace Itvitae_WPF_GameOfLife.Extentions
 {
     public static class BitmapConverter
     {
+        /// <summary>
+        /// REALLY SLOW!
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="fromSize"></param>
+        /// <param name="toSize"></param>
+        /// <returns></returns>
         public static BitmapImage Convert(this Bitmap src, int fromSize, int toSize)
         {
             //src = src.Rescale(fromSize, toSize);
