@@ -44,6 +44,11 @@ namespace GameOfLife.Controllers
             }
         }
 
+        public void UpdateBitMapDataIncludingGrid()
+        {
+
+        }
+
         public Color GetColorAt(int x, int y)
         {
             return template.GetColor(

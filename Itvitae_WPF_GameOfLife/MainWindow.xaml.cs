@@ -25,6 +25,7 @@ namespace Itvitae_WPF_GameOfLife
         int milisecondsGameSpeed = 0;
         bool GameIsRunning = false;
         bool enableGhosting = false;
+        bool gridShowing = false;
         System.Drawing.Color colorHolder;
 
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
@@ -50,11 +51,14 @@ namespace Itvitae_WPF_GameOfLife
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             map.CheckWorldMap(true); //Check each cell in the world
-            //map.UpdateWorldMap(); //Update its status
+                                     //map.UpdateWorldMap(); //Update its status
 
             ////Perry's own solution
-            
-            map.UpdateBitMapData(); //Generate a Bitmap to display
+
+            if (gridShowing)
+                map.UpdateBitMapDataIncludingGrid();
+            else
+                map.UpdateBitMapData(); //Generate a Bitmap to display
             if(map.hasBeenUpdated)  //No need to update if there was nothing that has been changed.
                 MapImage.Source = map.GetBitMapData().Convert(mapSize, 500); //Convert the Bitmap to a type the WPF image thingy can understand.
 
@@ -137,7 +141,11 @@ namespace Itvitae_WPF_GameOfLife
             {
                 map.ChangeCellAliveStatus(new Point2(mouseLocation.X, mouseLocation.Y), 500, 500, true, true);
 
-                map.UpdateBitMapData();
+                if (gridShowing)
+                    map.UpdateBitMapDataIncludingGrid();
+                else
+                    map.UpdateBitMapData();
+
                 MapImage.Source = map.GetBitMapData().Convert(mapSize, 500);
             }
         }
@@ -183,6 +191,16 @@ namespace Itvitae_WPF_GameOfLife
             map.enableGhosting = enableGhosting;
         }
 
+        public void ShowGrid(bool show)
+        {
+            if (show)
+            {
+                GridImage.Visibility = Visibility.Visible;
+            }
+            else
+                GridImage.Visibility = Visibility.Hidden;
+        }
+
         private void spawnRandomBtn_Click(object sender, RoutedEventArgs e)
         {
             map.RandomAlive(20, new Random().Next(5,200));
@@ -195,6 +213,12 @@ namespace Itvitae_WPF_GameOfLife
         {
             enableGhosting = (bool)enableGhostingCheckbox.IsChecked;
             map.enableGhosting = enableGhosting; //I know, but we need it in map generation to
+        }
+
+        private void gridBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ShowGrid(!gridShowing);
+            gridShowing = !gridShowing;
         }
     }
 }
