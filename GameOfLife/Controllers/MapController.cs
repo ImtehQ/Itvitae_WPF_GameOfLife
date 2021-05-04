@@ -32,12 +32,17 @@ namespace GameOfLife.Controllers
             {
                 for (int x = 0; x < cellWidth; x++)
                 {
-                    mapDataGraphics.FillRectangle(template.GetColor(
-                        CellControllers[x, y].GetAliveLastFrame(), 
-                        CellControllers[x, y].GetAliveCurrentFrame(),
-                        CellControllers[x, y].GetCorrupt(), enableGhosting), x, y, 1, 1);
+                    mapData.SetPixel(x, y, GetColorAt(x, y));
                 }
             }
+        }
+
+        public Color GetColorAt(int x, int y)
+        {
+            return template.GetColor(
+                        CellControllers[x, y].GetAliveLastFrame(),
+                        CellControllers[x, y].GetAliveCurrentFrame(),
+                        CellControllers[x, y].GetCorrupt(), enableGhosting);
         }
 
         public Bitmap GetBitMapData()

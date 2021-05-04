@@ -4,6 +4,10 @@ using System.Windows.Input;
 using GameOfLife.Extentions;
 using Itvitae_WPF_GameOfLife.Extentions;
 using System;
+using Itvitae_WPF_GameOfLife.Controllers;
+using System.Windows.Threading;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace Itvitae_WPF_GameOfLife
 {
@@ -12,16 +16,18 @@ namespace Itvitae_WPF_GameOfLife
     /// </summary>
     public partial class MainWindow : Window
     {
-        public System.Windows.Point mouseLocation;
+        public Point mouseLocation;
 
         MapController map;
+        MapDisplayController mapDisplayController;
 
         int mapSize = 0;
         int milisecondsGameSpeed = 0;
         bool GameIsRunning = false;
         bool enableGhosting = false;
+        System.Drawing.Color colorHolder;
 
-        System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+        DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
 
         public MainWindow()
@@ -45,9 +51,14 @@ namespace Itvitae_WPF_GameOfLife
         {
             map.CheckWorldMap(true); //Check each cell in the world
             //map.UpdateWorldMap(); //Update its status
-            map.UpdateBitMapData(); //Generate a Bitmap to display
 
+            ////Perry's own solution
+            map.UpdateBitMapData(); //Generate a Bitmap to display
             MapImage.Source = map.GetBitMapData().Convert(mapSize, 500); //Convert the Bitmap to a type the WPF image thingy can understand.
+
+            ////Microsoft solution copy-paste
+            //UpdateDisplayMap();
+            //MapImage.Source = mapDisplayController.GetMap();
         }
 
         private void StartStopBtn_Click(object sender, RoutedEventArgs e)
@@ -88,6 +99,18 @@ namespace Itvitae_WPF_GameOfLife
             GameIsRunning = false;
         }
 
+        private void UpdateDisplayMap()
+        {
+            for (int y = 0; y < mapSize; y++)
+            {
+                for (int x = 0; x < mapSize; x++)
+                {
+                    colorHolder = map.GetColorAt(x, y);
+                    mapDisplayController.SetPixel(x, y, colorHolder.R, colorHolder.G, colorHolder.B, colorHolder.A);
+                }
+            }
+        }
+
         private void ResetBtn_Click(object sender, RoutedEventArgs e)
         {
 
@@ -97,8 +120,6 @@ namespace Itvitae_WPF_GameOfLife
         {
 
         }
-
-
 
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
@@ -140,6 +161,7 @@ namespace Itvitae_WPF_GameOfLife
         private void generateMapBtn_Click(object sender, RoutedEventArgs e)
         {
             map = new MapController(mapSize);
+            //mapDisplayController = new MapDisplayController(mapSize, mapSize);
 
             //Generate the blank world data
             map.GenerateWorldMap();

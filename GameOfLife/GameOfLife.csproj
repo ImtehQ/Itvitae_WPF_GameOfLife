@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

@@ -40,6 +40,6 @@ namespace Itvitae_WPF_GameOfLife.Extentions
                 }
             }
             return resultImage;
-        }
+        } 
     }
 }
