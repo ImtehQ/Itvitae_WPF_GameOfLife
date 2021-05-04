@@ -17,6 +17,7 @@ namespace GameOfLife.Controllers
 
         private Rule rule = new Default();
 
+        public bool updated = false;
 
         private void CheckCoruption()
         {
@@ -38,6 +39,8 @@ namespace GameOfLife.Controllers
         /// <param name="autoUpdate"></param>
         public void UpdateAlive(bool autoUpdate)
         {
+            updated = false;
+
             CheckCoruption();
 
             if (cell.Corrupt)
@@ -47,7 +50,12 @@ namespace GameOfLife.Controllers
             neighborsAliveCount = cell.neighbors.Count(n => n.aliveLastFrame == true);
 
             //Before we set the cells new state, we save its last state
-            cell.aliveLastFrame = cell.aliveCurrentFrame;
+            if(cell.aliveLastFrame != cell.aliveCurrentFrame)
+            {
+                updated = true;
+                cell.aliveLastFrame = cell.aliveCurrentFrame;
+            }
+
             //Its not needed for the game, but does add a ton of extra options.
             cell.aliveCurrentFrame = rule.NewState(cell.aliveLastFrame, neighborsAliveCount);
 
@@ -89,6 +97,8 @@ namespace GameOfLife.Controllers
         /// <param name="value"></param>
         public void SetAlive(bool value, bool includeLastFrame, bool toggle = false)
         {
+            updated = true;
+
             if (toggle)
                 cell.aliveCurrentFrame = !cell.aliveCurrentFrame;
             else

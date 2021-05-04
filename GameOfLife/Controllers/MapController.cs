@@ -18,6 +18,8 @@ namespace GameOfLife.Controllers
 
         public bool enableGhosting = false;
 
+        public bool hasBeenUpdated = false;
+
         public Bitmap GenerateBitMapData()
         {
             mapData = new Bitmap(cellWidth, cellWidth);
@@ -28,11 +30,16 @@ namespace GameOfLife.Controllers
 
         public void UpdateBitMapData()
         {
+            hasBeenUpdated = false;
             for (int y = 0; y < cellWidth; y++)
             {
                 for (int x = 0; x < cellWidth; x++)
                 {
-                    mapData.SetPixel(x, y, GetColorAt(x, y));
+                    if (CellControllers[x, y].updated == true)
+                    {
+                        mapData.SetPixel(x, y, GetColorAt(x, y));
+                        hasBeenUpdated = true;
+                    }
                 }
             }
         }

@@ -53,8 +53,10 @@ namespace Itvitae_WPF_GameOfLife
             //map.UpdateWorldMap(); //Update its status
 
             ////Perry's own solution
+            
             map.UpdateBitMapData(); //Generate a Bitmap to display
-            MapImage.Source = map.GetBitMapData().Convert(mapSize, 500); //Convert the Bitmap to a type the WPF image thingy can understand.
+            if(map.hasBeenUpdated)  //No need to update if there was nothing that has been changed.
+                MapImage.Source = map.GetBitMapData().Convert(mapSize, 500); //Convert the Bitmap to a type the WPF image thingy can understand.
 
             ////Microsoft solution copy-paste
             //UpdateDisplayMap();
